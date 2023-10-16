@@ -1,0 +1,7 @@
+# Environment variables
+.env
+APIKEY.env
+
+# Python cache files
+__pycache__/
+*.pyc
