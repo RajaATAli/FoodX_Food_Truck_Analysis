@@ -55,14 +55,15 @@ def determine_cuisine(name):
                 return cuisine
     return "Unknown"
 
-def get_opening_hours(place_id):
+def get_opening_hours_and_website(place_id):
     try:
         place_details = gmaps.place(place_id=place_id)
         opening_hours = place_details.get('result', {}).get('opening_hours', {}).get('weekday_text', [])
-        return '\n'.join(opening_hours)
+        website = place_details.get('result', {}).get('website', 'null')
+        return '\n'.join(opening_hours), website
     except Exception as e:
-        logging.error(f"Error fetching opening hours for place ID {place_id}: {e}")
-        return "Unknown"
+        logging.error(f"Error fetching details for place ID {place_id}: {e}")
+        return "Unknown", "null"
 
 def extract_food_truck_info(data):
     df = pd.DataFrame(data)
@@ -71,11 +72,9 @@ def extract_food_truck_info(data):
     df.drop_duplicates(subset='place_id', keep='first', inplace=True)
     
     df['Cuisine Type'] = df['name'].apply(determine_cuisine)
-    if 'website' not in df.columns:
-        df['website'] = 'null'
-    else:
-        df['website'].fillna('null', inplace=True)
-    df['Opening Hours'] = df['place_id'].apply(get_opening_hours)
+    
+    df['Opening Hours'], df['website'] = zip(*df['place_id'].apply(get_opening_hours_and_website))
+    
     columns = ['name', 'formatted_address', 'rating', 'website', 'Opening Hours', 'Cuisine Type']
     df_cleaned = df[columns]
     df_cleaned.columns = ['Name', 'Address', 'Rating', 'Website', 'Opening Hours', 'Cuisine Type']
