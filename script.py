@@ -19,7 +19,7 @@ if not API_KEY:
 # Initialize the client with your API key
 gmaps = googlemaps.Client(key=API_KEY)
 
-def get_food_trucks_data(query, location="Indiana, USA", max_results=3):
+def get_food_trucks_data(query, location="Indiana, USA", max_results=50):
     try:
         results = gmaps.places(query=query, location=location, type='restaurant')
         food_trucks = results.get('results', [])
@@ -38,6 +38,7 @@ def get_food_trucks_data(query, location="Indiana, USA", max_results=3):
         logging.error(f"Error fetching food truck data: {e}")
         return []
 
+# Implement ML method if have enough time - use labeled dataset to train a text classification model or use already trained model to predict cuisine based on restaurant name
 def determine_cuisine(name):
     cuisines = {
         'Mexican': ['taco', 'mexican', 'burrito', 'quesadilla'],
